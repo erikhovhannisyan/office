@@ -10,7 +10,6 @@ class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $resultArray = [];
         $result = [];
         // dd("text");  
         $data = $request->input('data_name');
