@@ -16,12 +16,17 @@
         box-sizing: border-box;
     }
 
+    body {
+        background-color: gainsboro;
+    }
+
     .main {
         width: 80%;
-        height: 700px;
-        border: 2px solid grey;
+        min-height: 700px;
+        height: auto;
+        border: 3px solid grey;
         margin-left: 10%;
-        margin-top: 100px;
+        margin-top: 70px;
     }
 
     .input {
@@ -36,12 +41,15 @@
         text-align: center;
         font-size: 18px;
         color: grey;
-        float: left
+        float: left;
+        background-color: gray;
+        color: white;
     }
 
     .input::placeholder {
         text-align: center;
-        font-size: 15px;
+        font-size: 20px;
+        color: white;
     }
 
     .button {
@@ -51,19 +59,32 @@
         margin-top: 50px;
         margin-left: 25%;
         font-size: 18px;
-        color: grey;
+        color: white;
+        background-color: gray;
+        cursor: pointer;
     }
 
     .print {
         width: 90%;
         height: auto;
-        border: 1px solid black;
-        margin-top: 100px;
-        margin-left: 5%
+        border: 1px solid green;
+        margin-top: 150px;
+        margin-left: 5%;
+        margin-bottom: 50px;
     }
-    .images{
-        width:20%;
-        height:220px;
+
+    .images {
+        width: 20%;
+        height: 220px;
+    }
+
+    .button:hover {
+        color: green;
+    }
+
+    .input-error::placeholder {
+        color: red;
+        font-size: 26px;
     }
     </style>
     <div class="main">
@@ -77,10 +98,17 @@
     </div>
 
     <script>
-    $(document).ready(function() {
-        $('#sendButton').on('click', function() {
-            var dataToSend = $('#data_name').val();
+    var old_data = "";
+    $('#sendButton').on('click', function() {
+        var dataToSend = $('#data_name').val();
 
+        if (dataToSend == "") {
+                $("#data_name").addClass("input-error").attr("placeholder", "Can't be Empty");
+            } else {
+                $("#data_name").removeClass("input-error");
+            }
+        if (old_data !== dataToSend) {
+            old_data = dataToSend;
             $.ajax({
                 type: "GET",
                 url: "{{ route('search') }}",
@@ -102,20 +130,16 @@
                             imgElement.src = value;
                             imgElement.alt = key;
                             output.appendChild(imgElement);
+                            
+
                         }
+                        
                     }
-
-                    //  const imgElement = document.getElementById('imageElement');
-                    //     imgElement.src = value;
+                    $('#data_name').val('');
                 }
-                // $('#output').attr('src', value);
-                // console.log(response);   
-
             });
-            //  console.log(dataToSend);
-
-        });
-
+        }
+        
     });
     </script>
 
