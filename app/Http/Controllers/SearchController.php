@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 
+
 class SearchController extends Controller
 {
     public function search(Request $request)
@@ -13,6 +14,7 @@ class SearchController extends Controller
         $result = [];
         // dd("text");  
         $data = $request->input('data_name');
+
         // $data = 'cars moto';
         $baseUrl = 'https://openverse.org/search/?q=';
         // $pattern = '/src=["\'](?!.*\.js)(.*?)["\']/i';
@@ -20,6 +22,7 @@ class SearchController extends Controller
 
         $words = explode(' ', $data);
         foreach ($words as $word) {
+
             $concatenatedUrl = $baseUrl . $word;
             $htmlContent = file_get_contents($concatenatedUrl);
             if (preg_match_all($pattern, $htmlContent, $matches)) {
