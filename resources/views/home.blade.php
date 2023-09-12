@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-
-<body>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <style>
     * {
         margin: 0;
@@ -21,12 +19,22 @@
     }
 
     .main {
-        width: 80%;
+        width: 70%;
         min-height: 700px;
         height: auto;
         border: 3px solid grey;
         margin-left: 10%;
         margin-top: 70px;
+        float: left;
+    }
+
+    .for_images {
+        width: 10%;
+        min-height: 700px;
+        height: auto;
+        border: 3px solid grey;
+        margin-top: 70px;
+        float: left;
     }
 
     .input {
@@ -86,67 +94,101 @@
         color: red;
         font-size: 26px;
     }
+
+    .draggable {
+        width: 100px;
+        height: 100px;
+        cursor: pointer;
+    }
+    .drop-area {
+            width: 100%;
+            height: 100px;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding-top: 40px;
+            font-weight: bold;
+        }
     </style>
+</head>
+
+<body>
     <div class="main">
-
-
-        <input type=text placeholder="What you want to search?" class="input" name="data_name" id=data_name>
+        <input type="text" placeholder="What you want to search?" class="input" name="data_name" id="data_name">
         <button class="button" id="sendButton">Search</button>
-        <div class="print" id="output">
-
+        <div class="print" id="output"></div>
+    </div>
+    <div class="for_images" id="image-container">
+        <div id="drop-area" class="drop-area">
+            Drop Here
         </div>
     </div>
 
     <script>
-    var old_data = "";
-    $('#sendButton').on('click', function() {
-        var dataToSend = $('#data_name').val();
+        var old_data = "";
+        $('#sendButton').on('click', function() {
+            var dataToSend = $('#data_name').val();
 
-        if (dataToSend == "") {
+            if (dataToSend == "") {
                 $("#data_name").addClass("input-error").attr("placeholder", "Can't be Empty");
             } else {
                 $("#data_name").removeClass("input-error");
             }
-        if (old_data !== dataToSend) {
-            old_data = dataToSend;
-            $.ajax({
-                type: "GET",
-                url: "{{ route('search') }}",
-                dataType: "Json",
-                data: {
-                    data_name: dataToSend
 
-                },
-                success: function(response) {
-                    const output = document.getElementById('output');
-                    const keys = Object.keys(response);
-                    for (const key of keys) {
-                        const values = response[key];
-                        console.log(`Key: ${key}`);
-                        for (const value of values) {
-                            console.log(`Value: ${value}`);
-                            const imgElement = document.createElement('img');
-                            imgElement.className = 'images';
-                            imgElement.src = value;
-                            imgElement.alt = key;
-                            output.appendChild(imgElement);
-                            
-
+            if (old_data !== dataToSend) {
+                old_data = dataToSend;
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('search') }}",
+                    dataType: "json",
+                    data: {
+                        data_name: dataToSend
+                    },
+                    success: function(response) {
+                        const output = document.getElementById('output');
+                        const keys = Object.keys(response);
+                        output.innerHTML = ''; 
+                        for (const key of keys) {
+                            const values = response[key];
+                            console.log(`Key: ${key}`);
+                            for (const value of values) {
+                                console.log(`Value: ${value}`);
+                                const imgElement = document.createElement('img');
+                                imgElement.className = 'images';
+                                imgElement.src = value;
+                                imgElement.alt = key;
+                                output.appendChild(imgElement);
+                            }
                         }
-                        
+
+                       
+                        $('.images').draggable({
+                            containment: "#image-container",
+                            cursor: "move",
+                            revert: "invalid",
+                        });
                     }
-                    $('#data_name').val('');
-                }
-            });
-        }
-        
-    });
+                });
+            }
+            $('#data_name').val('');
+        });
+
+      
+        $("#drop-area").droppable({
+            accept: ".images", 
+            drop: function(event, ui) {
+                const droppedImage = ui.helper; 
+                const dropArea = $(this); 
+
+              
+                droppedImage.appendTo(dropArea);
+
+          
+                console.log("Image dropped!");
+
+              
+            }
+        });
     </script>
-
-
-
-
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 </body>
 
 </html>
