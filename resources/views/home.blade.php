@@ -28,6 +28,30 @@
             float: left;
         }
 
+        .pop_up {
+            width: 86%;
+            height: 600px;
+            border: 4px solid black;
+            margin-top: 50px;
+            margin-left: 7%;
+            display: none;
+            background-color: #FAACA8;
+            background-image: linear-gradient(19deg, #FAACA8 0%, #DDD6F3 100%);
+
+        }
+
+        .close {
+            float: right;
+            width: 5%;
+            height: 45px;
+            border: 1px solid red;
+            font-size: 50px;
+            line-height: 30px;
+            text-align: center;
+            color: red;
+            cursor: pointer;
+        }
+
         .for_images {
             width: 40%;
             min-height: 900px;
@@ -127,12 +151,14 @@
             background-color: beige;
         }
 
-        /* .ui-draggable-handle {
-            position: relative;
-            left: 15%;
-            top: 30px;
-            width: 70%;
-        } */
+        .photos {
+            width: 86%;
+            height: 480px;
+            margin-top: 50px;
+            margin-left: 7%;
+            border-radius: 15px;
+
+        }
 
         .input-error::placeholder {
             color: red;
@@ -146,10 +172,12 @@
             <input type="text" placeholder="What you want to search?" class="input" name="data_name" id="data_name">
             <button class="button" id="sendButton">Search</button>
             <div class="print" id="output"></div>
+            <div class="pop_up" id="pop_up">
+                <img id="carousel-image" src="" alt="Image Carousel" class="photos">
+                <div class="close" id="close">x</div>
+            </div>
         </div>
         <div class="for_images" id="image-container">
-            <!-- <h1 class="h1">Drop Here</h1> -->
-            <!-- <div class="drop_images" id="drop_images"></div> -->
         </div>
 
         <script>
@@ -157,9 +185,9 @@
         var div1 = document.getElementById('image-container');
         var div2 = document.getElementById('main');
         var div = document.getElementById('div');
+        var imageUrls = [];
         $('#sendButton').on('click', function() {
             var dataToSend = $('#data_name').val();
-
             if (dataToSend == "") {
                 $("#data_name").addClass("input-error").attr("placeholder", "Can't be Empty");
             } else {
@@ -173,10 +201,8 @@
                     dataType: "Json",
                     data: {
                         data_name: dataToSend
-
                     },
                     success: function(response) {
-
                         const output = document.getElementById('output');
                         const keys = Object.keys(response);
                         for (const key of keys) {
@@ -191,7 +217,9 @@
                                 imgElement.setAttribute('data-type', key);
                                 imgElement.setAttribute('id', key);
                                 output.appendChild(imgElement);
+                                imageUrls.push(imgElement.src);
                             }
+                            console.log(imageUrls);
 
                             function createDiv() {
                                 var newDiv = document.createElement("div");
@@ -203,18 +231,15 @@
                                 newDiv.appendChild(h1);
                                 document.getElementById("image-container").appendChild(newDiv);
 
-                                // $("#div").sortable();
+                                $(".div").sortable();
                             }
                             createDiv();
                         }
-
                         $("#image-container").css("display", "flex");
                         $("#output").css("display", "block");
                         $('.images').draggable({
                             cursor: "move",
-                            revert: "invalid",
-                            left: 0,
-
+                            revert: true,
                         });
                         $('.div').droppable({
                             accept: ".images",
@@ -228,13 +253,45 @@
                                         height: '155px'
                                     });
                                     $(this).append(ui.helper);
+                                    var output = document.getElementById('output');
+                                    var x = document.getElementById('close');
+                                    if (output.innerHTML.trim() === '') {
+                                        x.style.display = 'block';
+                                        pop_up.style.display = 'block';
+                                        var currentIndex = 0;
+                                        var carouselImage = document.getElementById(
+                                            'carousel-image');
+
+                                        function nextImage() {
+                                            currentIndex = (currentIndex + 1) %
+                                                imageUrls
+                                                .length;
+                                            updateImage();
+                                        }
+
+                                        function prevImage() {
+                                            currentIndex = (currentIndex - 1 + imageUrls
+                                                .length) % imageUrls.length;
+                                            updateImage();
+                                        }
+
+                                        function updateImage() {
+                                            carouselImage.src = imageUrls[currentIndex];
+                                        }
+
+                                        updateImage();
+                                        setInterval(nextImage, 3000);
+                                    }
+                                    x.onclick = function() {
+                                        pop_up.style.display = 'none';
+                                        x.style.display = 'none';
+                                    }
+
                                 } else {
-                                    
+
                                     alert(
                                         'You can only drop images in the matching container.'
-                                        );
-                             
-
+                                    );
                                 }
                             }
                         });
