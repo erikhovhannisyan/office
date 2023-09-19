@@ -1,13 +1,13 @@
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title></title>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        <style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -32,24 +32,24 @@
             width: 86%;
             height: 600px;
             border: 4px solid black;
-            margin-top: 50px;
+            margin-top: 115px;
             margin-left: 7%;
             display: none;
-            background-color: #FAACA8;
-            background-image: linear-gradient(19deg, #FAACA8 0%, #DDD6F3 100%);
-
+            background-color: gainsboro;
+            position: relative;
+            border-radius: 15px;
         }
 
         .close {
             float: right;
             width: 5%;
             height: 45px;
-            border: 1px solid red;
             font-size: 50px;
             line-height: 30px;
             text-align: center;
-            color: red;
+            color: black;
             cursor: pointer;
+            display: none;
         }
 
         .for_images {
@@ -114,7 +114,7 @@
         .print {
             width: 90%;
             height: auto;
-            border: 2px solid green;
+            border: 2px solid black;
             margin-top: 150px;
             margin-left: 5%;
             margin-bottom: 50px;
@@ -128,7 +128,7 @@
         }
 
         .h1 {
-            color: green;
+            color: white;
         }
 
         .images {
@@ -139,48 +139,105 @@
         .button:hover {
             color: green;
         }
-
+        .close:hover{
+            color: red;
+        }
         .div {
             width: 50%;
             min-height: 800px;
             height: auto;
-            border: 3px solid green;
+            border: 3px solid black;
             margin-left: 2%;
             margin-top: 45px;
             float: left;
-            background-color: beige;
+            background-color: grey;
         }
 
-        .photos {
-            width: 86%;
+        .carousel-image {
+            width: 88%;
             height: 480px;
-            margin-top: 50px;
-            margin-left: 7%;
+            margin-top: 55px;
+            margin-left:6%;
             border-radius: 15px;
 
+        }
+
+
+
+        #indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .indicator {
+            width: 50px;
+            height: 10px;
+            background-color: grey;
+            /* border-radius: 50%; */
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .active {
+            background-color: white;
+            /* Color for the active indicator */
+        }
+
+        .prev {
+            width: 5%;
+            height: 6%;
+            font-size: 70px;
+            top: 47%;
+            position: absolute;
+        }
+
+        .next {
+            width: 5%;
+            height: 6%;
+            font-size: 70px;
+            top: 47%;
+            position: absolute;
+            left: 95%;
+        }
+
+        .next:hover{
+            color:white;
+            cursor:pointer;
+        }
+        .prev:hover{
+            color:white;
+            cursor:pointer;
         }
 
         .input-error::placeholder {
             color: red;
             font-size: 26px;
         }
-        </style>
-    </head>
+    </style>
+</head>
 
-    <body>
-        <div class="main" id="main">
-            <input type="text" placeholder="What you want to search?" class="input" name="data_name" id="data_name">
-            <button class="button" id="sendButton">Search</button>
-            <div class="print" id="output"></div>
-            <div class="pop_up" id="pop_up">
-                <img id="carousel-image" src="" alt="Image Carousel" class="photos">
-                <div class="close" id="close">x</div>
+<body>
+    <div class="main" id="main">
+        <input type="text" placeholder="What you want to search?" class="input" name="data_name" id="data_name">
+        <button class="button" id="sendButton">Search</button>
+        <div class="print" id="output"></div>
+        <div class="pop_up" id="pop_up">
+            <div class="close" id="close">x</div>
+            <div id="prev-button" class="prev">
+                <</div>
+                    <img id="carousel-image" src="" alt="Carousel Image" class="carousel-image">
+                    <div id="next-button" class="next">></div>
             </div>
-        </div>
-        <div class="for_images" id="image-container">
-        </div>
 
-        <script>
+            <div id="indicators"></div>
+
+        </div>
+    </div>
+    <div class="for_images" id="image-container">
+    </div>
+
+    <script>
         var old_data = "";
         var div1 = document.getElementById('image-container');
         var div2 = document.getElementById('main');
@@ -258,33 +315,58 @@
                                     if (output.innerHTML.trim() === '') {
                                         x.style.display = 'block';
                                         pop_up.style.display = 'block';
+
                                         var currentIndex = 0;
-                                        var carouselImage = document.getElementById(
-                                            'carousel-image');
+                                        var carouselImage = document.getElementById('carousel-image');
+                                        var prevButton = document.getElementById('prev-button');
+                                        var nextButton = document.getElementById('next-button');
+                                        var indicatorsContainer = document.getElementById('indicators');
+
+                                        function updateImage() {
+                                            carouselImage.src = imageUrls[currentIndex];
+                                            updateIndicators();
+                                        }
 
                                         function nextImage() {
-                                            currentIndex = (currentIndex + 1) %
-                                                imageUrls
-                                                .length;
+                                            currentIndex = (currentIndex + 1) % imageUrls.length;
                                             updateImage();
                                         }
 
                                         function prevImage() {
-                                            currentIndex = (currentIndex - 1 + imageUrls
-                                                .length) % imageUrls.length;
+                                            currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
                                             updateImage();
                                         }
 
-                                        function updateImage() {
-                                            carouselImage.src = imageUrls[currentIndex];
+                                        function updateIndicators() {
+                                            indicatorsContainer.innerHTML = '';
+                                            for (let i = 0; i < imageUrls.length; i++) {
+                                                const indicator = document.createElement('div');
+                                                indicator.classList.add('indicator');
+                                                if (i === currentIndex) {
+                                                    indicator.classList.add('active');
+                                                }
+                                                indicator.addEventListener('click', () => {
+                                                    currentIndex = i;
+                                                    updateImage();
+                                                });
+                                                indicatorsContainer.appendChild(indicator);
+                                            }
                                         }
 
-                                        updateImage();
-                                        setInterval(nextImage, 3000);
+                                        function startCarousel() {
+                                            updateImage();
+                                            setInterval(nextImage, 7000);
+                                        }
+
+                                        startCarousel();
+
+                                        prevButton.addEventListener('click', prevImage);
+                                        nextButton.addEventListener('click', nextImage);
+
                                     }
                                     x.onclick = function() {
-                                        pop_up.style.display = 'none';
-                                        x.style.display = 'none';
+                                       
+                                        location.reload();
                                     }
 
                                 } else {
@@ -302,7 +384,7 @@
                 });
             }
         });
-        </script>
-    </body>
+    </script>
+</body>
 
-    </html>
+</html>
